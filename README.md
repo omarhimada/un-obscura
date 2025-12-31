@@ -1,14 +1,8 @@
-﻿ ## un-obscura CLI
- ### This CLI tool reverse-engineers generated `html` and `css` to re-map class and ID tokens to new, unobscured stable names. 
- 
- ##### Give it the `.ccs` and the `.html` and it will make turning things into components much easier for you.
- ---
- #### Purpose
- - Reversee engineering `React/Typescript` website templates in order to build similar components in `Blazor + SignalR` as an example. 
- - Turning things into re-usable `Blazor + SignalR` frontends whiile avoiding `JSInterop` is incredibly annoying. 
- - *I don't want `JSInterop`.*
- - **Example: I paid $179.00 USD for an admin C# .NET server-side template, so I could take some of the components for my own project, but the purchased template ended up `JSInterop` on every page and used over a hundred `npm` packages.**
- - Anyways...
+un-obscura CLI 🜂
+
+A .NET CLI tool that reverse-engineers obfuscated HTML + CSS tokens and re-maps class/ID names to stable, unobscured component-friendly names — making it dramatically easier to port React templates into Blazor + SignalR frontends without touching JSInterop.
+
+**Yes, I am still mad about paying for a $179 admin template that imported the entire npm registry and then glued JSInterop to every page like decorative pasta.**
 
  ---
   #### Usage
@@ -17,11 +11,11 @@
     - Optional arguments: 
     - `--prefix c` to specify output prefix for class and ID names. 
     - Default is `c` for classes and `id` for IDs. You can make up your own.
-    - `--mode guid` *GUID-like e.g.: Webflow and w-node-...)
-      - (GUID-like or hashyopaque (default) + Webflow w-node-...)
-    - `--mode hash` 
+    - `--mode guid` *GUID-like e.g.: Webflow and w-node-...*
+    - `--mode hash`  *Targets hashed/opaque tokens*
+    - `--mode opaque` *(Default) Matches anything that looks emotionally cryptic*
  
-- For my example included I used neither of those modes and the default worked great,
+In my sample, I used none of the fancy modes and the defaults worked great. It’s like the tool could sense my disappointment and adapted automatically.
 
 ---
 #### Description
@@ -43,5 +37,10 @@
      - `out/output.css`
      - `out/class-map.json`
      - `out/id-map.json`
-
-
+---
+#### Use cases
+- Porting React → Blazor components
+- Un-obfuscating design templates for learning or privacy
+- Standardizing CSS tokens before componentization
+- Reducing markup entropy
+- Avoiding npm-based existential regret
