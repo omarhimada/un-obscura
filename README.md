@@ -1,4 +1,4 @@
-﻿ ## (Un)obscura CLI
+﻿ ## un-obscura CLI
  ### This CLI tool reverse-engineers generated `html` and `css` to re-map class and ID tokens to new, unobscured stable names. 
  
  ##### Give it the `.ccs` and the `.html` and it will make turning things into components much easier for you.
