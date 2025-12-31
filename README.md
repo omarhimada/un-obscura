@@ -28,7 +28,7 @@ dotnet run --
  If you don't like command-line you can also open VS Code or Visual Studio or whatever IDE and just run it yourself.
  The whole pgrogram takes about a second to finish.
 
- ![Example Inout and Output](./images/reason.png)
+ ![Example Inout and Output](https://github.com/omarhimada/un-obscura/blob/master/reason.png)
 
 
 - Optional arguments: 
