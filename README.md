@@ -2,6 +2,7 @@
  ### This CLI tool reverse-engineers generated `html` and `css` to re-map class and ID tokens to new, unobscured stable names. 
  
  ##### Give it the `.ccs` and the `.html` and it will make turning things into components much easier for you.
+ ##### It also downloads the associated `.js` and relocates them to the output folder.
  ---
  #### Purpose
  - Reversee engineering `React/Typescript` website templates in order to build similar components in `Blazor + SignalR` as an example. 
@@ -12,16 +13,38 @@
 
  ---
   #### Usage
-- `dotnet run -- --html path/to/index.html --css path/to/site.css --out ./out --prefix c`
-  
-    - Optional arguments: 
-    - `--prefix c` to specify output prefix for class and ID names. 
-    - Default is `c` for classes and `id` for IDs. You can make up your own.
-    - `--mode guid` *GUID-like e.g.: Webflow and w-node-...)
-      - (GUID-like or hashyopaque (default) + Webflow w-node-...)
-    - `--mode hash` 
+  ```
+  dotnet run -- 
+      --html ../../../Example/example.html 
+      --css ../../../Example/example.css 
+      --out ./out 
+      --prefix c`
+  ```
+
+#### Advamced Isage
+  ```
+dotnet run -- 
+    --html ../../../Example/example.html 
+    --css ../../../Example/example.css 
+    --out ./out
+    --downloadScripts 
+    --prefix inspired-ty
+    --scriptOut ./out/www/scripts
+  ```
  
-- For my example included I used neither of those modes and the default worked great,
+ If you don't like command-line you can also open VS Code or Visual Studio or whatever IDE and just run it yourself.
+ The whole pgrogram takes about a second to finish.
+
+ ![Example Inout and Output](./images/reason.png)
+
+
+- Optional arguments: 
+- `--prefix c` to specify output prefix for class and ID names. 
+    - Default is `c` for classes and `id` for IDs. You can make up your own.
+- `--mode guid` *GUID-like e.g.: Webflow and w-node-...)
+    - (GUID-like or hashyopaque (default) + Webflow w-node-...)
+- `--mode hash` 
+    - For my example included I used neither modes so the default is working great.
 
 ---
 #### Description

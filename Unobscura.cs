@@ -80,7 +80,21 @@ public partial class Unobscura : UnobscuraBase {
             Console.WriteLine($"Class map   : {outClassMap}");
             Console.WriteLine($"ID map      : {outIdMap}");
             Console.WriteLine($"Renamed     : {classMap.Count} classes, {idMap.Count} ids");
+            if (options.DownloadScripts) {
+                Console.WriteLine("Downloading and relinking scripts...");
+                if (options.DownloadScripts) {
+                    DownloadAndRelinkScriptsAsync(
+                        htmlPath: outHtml,
+                        outputRoot: options.OutDir,
+                        baseUrl: options.BaseUrl,
+                        localScriptPrefix: options.ScriptPrefix,
+                        cancellationToken: CancellationToken.None
+                    ).GetAwaiter().GetResult();
+                }
+            }
 
+            Console.WriteLine("You can likely exit. Check the output folder specified.");
+            Console.ReadLine();
             return 0;
         } catch (Exception ex) {
             Console.Error.WriteLine(ex.ToString());
@@ -234,7 +248,7 @@ public partial class Unobscura : UnobscuraBase {
     private static Dictionary<string, string> OrderByKey(Dictionary<string, string> map) =>
          map.OrderBy(k => k.Key, StringComparer.Ordinal)
             .ToDictionary(k => k.Key, v => v.Value, StringComparer.Ordinal);
-    
+
 
     private static HashSet<string> ExtractHtmlClassTokens(string html) {
         HashSet<string> result = new HashSet<string>(StringComparer.Ordinal);
@@ -412,6 +426,9 @@ public partial class Unobscura : UnobscuraBase {
         public string ClassPrefix { get; private set; } = "c";
         public string IdPrefix { get; private set; } = "id";
         public RenameMode Mode { get; private set; } = RenameMode.GuidOrHashy;
+        public bool DownloadScripts { get; private set; } = false;
+        public string? BaseUrl { get; private set; } = null;
+        public string ScriptPrefix { get; private set; } = "./js";
 
         public static Options Parse(string[] args) {
             Dictionary<string, string> kv = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
@@ -435,38 +452,60 @@ public partial class Unobscura : UnobscuraBase {
             if (!kv.TryGetValue("css", out string? css) || string.IsNullOrWhiteSpace(css)) {
                 throw new ArgumentException("Missing --css path/to/file.css");
             }
-
-            Options o = new Options {
+            Options options = new Options {
                 HtmlPath = Path.GetFullPath(html),
-                CssPath = Path.GetFullPath(css),
+                CssPath = Path.GetFullPath(css)
             };
 
-            if (kv.TryGetValue("out", out string? outDir) && !string.IsNullOrWhiteSpace(outDir)) {
-                o.OutDir = Path.GetFullPath(outDir);
+            #region Options for downloading the JS and remapping
+            if (kv.TryGetValue("downloadScripts", out string? dl) &&
+                dl.Equals("true", StringComparison.OrdinalIgnoreCase)) {
+                // --html ../../../Example/example.html --css ../../../Example/example.css --downloadScripts --prefix unubscura --scriptPrefix ./out/js
+                
+                options.DownloadScripts = true;
             }
 
+            if (kv.TryGetValue("baseUrl", out string? bu) && !string.IsNullOrWhiteSpace(bu)) {
+                options.BaseUrl = bu;
+            }
+
+            if (kv.TryGetValue("scriptPrefix", out string? sp) && !string.IsNullOrWhiteSpace(sp)) {
+                options.ScriptPrefix = sp;
+            }
+            #endregion
+
+
+            if (kv.TryGetValue("out", out string? outDir) && !string.IsNullOrWhiteSpace(outDir)) {
+                options.OutDir = Path.GetFullPath(outDir);
+            }
+
+            #region Customize prefixes
             if (kv.TryGetValue("classPrefix", out string? cp) && !string.IsNullOrWhiteSpace(cp)) {
-                o.ClassPrefix = SanitizeCssIdentifierPrefix(cp);
+                options.ClassPrefix = SanitizeCssIdentifierPrefix(cp);
             }
 
             if (kv.TryGetValue("idPrefix", out string? ip) && !string.IsNullOrWhiteSpace(ip)) {
-                o.IdPrefix = SanitizeCssIdentifierPrefix(ip);
+                options.IdPrefix = SanitizeCssIdentifierPrefix(ip);
             }
+            #endregion
 
             if (kv.TryGetValue("mode", out string? mode) && !string.IsNullOrWhiteSpace(mode)) {
                 if (mode.Equals("guid", StringComparison.OrdinalIgnoreCase)) {
-                    o.Mode = RenameMode.GuidOnly;
+                    options.Mode = RenameMode.GuidOnly;
                 } else {
-                    o.Mode = RenameMode.GuidOrHashy;
+                    options.Mode = RenameMode.GuidOrHashy;
                 }
             }
 
-            if (!File.Exists(o.HtmlPath))
-                throw new FileNotFoundException("HTML file not found.", o.HtmlPath);
-            if (!File.Exists(o.CssPath))
-                throw new FileNotFoundException("CSS file not found.", o.CssPath);
 
-            return o;
+
+            if (!File.Exists(options.HtmlPath))
+                throw new FileNotFoundException("HTML file not found.", options.HtmlPath);
+            if (!File.Exists(options.CssPath))
+                throw new FileNotFoundException("CSS file not found.", options.CssPath);
+
+
+            return options;
         }
 
         private static string SanitizeCssIdentifierPrefix(string input) {

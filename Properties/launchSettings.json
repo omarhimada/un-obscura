@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "UnobscuraCLI": {
+      "commandName": "Project",
+      "commandLineArgs": "--html ../../../Example/example.html --css ../../../Example/example.css --downloadScripts --prefix example-prefix --scriptPrefix ./out/js"
+    }
+  }
+}
